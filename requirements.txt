@@ -24,3 +24,6 @@ redis[hiredis]==7.4.0
 requests==2.33.1
 requests-ratelimiter==0.8.0
 unidecode==1.4.0
+google-generativeai
+google-genai
+google

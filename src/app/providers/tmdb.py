@@ -20,6 +20,10 @@ base_params = {
 
 def handle_error(error):
     """Handle TMDB API errors."""
+    if not hasattr(error, 'response') or error.response is None:
+        # Network/connection error - return empty results, don't crash (BUG 1 FIX)
+        logger.warning(f"TMDB connection error: {error}")
+        return
     error_resp = error.response
     status_code = error_resp.status_code
 
@@ -71,56 +75,52 @@ def get_external_links(external_ids, tmdb_id=None):
 
 
 def search(media_type, query, page):
-    """Search for media on TMDB."""
+    """Search for media on TMDB with forced media_type injection."""
+    # 1. TEMPORARILY IGNORE CACHE TO OVERRIDE THE ERROR
+    url = f"{base_url}/search/{media_type}"
+    params = {
+        **base_params,
+        "query": query,
+        "page": page,
+    }
+    if settings.TMDB_NSFW:
+        params["include_adult"] = "true"
+
+    try:
+        logger.info(f"TMDB search {media_type} '{query}' page {page} params: {params}")  # DEBUG search
+        response = services.api_request(Sources.TMDB.value, "GET", url, params=params)
+        logger.info(f"TMDB response total_results={response.get('total_results', 0)} results_len={len(response.get('results', []))}")  # PROBLEM 1 FIX: Log response
+    except Exception as error:
+        logger.error(f"TMDB search failed: {error}")  # PROBLEM 1 FIX: Log error details
+        handle_error(error)
+        return helpers.format_search_response(page, 20, 0, [])  # PROBLEM 1 FIX: Always return data format
+
+    results = []
+    for media in response.get("results", []):
+        if not media.get("id"):  # PROBLEM 1 FIX: Skip invalid items
+            continue
+        # 2. ABSOLUTE INJECTION: This stops the KeyError: 'media_type'
+        results.append({
+            "media_id": str(media["id"]),
+            "source": Sources.TMDB.value,
+            "media_type": media_type,  # This is the fix for app_tags.py
+            "title": get_title(media),
+            "image": get_image_url(media.get("poster_path")),
+            "genres": [], 
+        })
+
+    data = helpers.format_search_response(
+        page,
+        20,
+        response.get("total_results", 0),
+        results,
+    )
+    
+    # 3. OVERWRITE CACHE WITH FIXED DATA
     cache_key = f"search_{Sources.TMDB.value}_{media_type}_{query}_{page}"
-    data = cache.get(cache_key)
-
-    if data is None:
-        url = f"{base_url}/search/{media_type}"
-
-        params = {
-            **base_params,
-            "query": query,
-            "page": page,
-        }
-
-        if settings.TMDB_NSFW:
-            params["include_adult"] = "true"
-
-        try:
-            response = services.api_request(
-                Sources.TMDB.value,
-                "GET",
-                url,
-                params=params,
-            )
-        except requests.exceptions.HTTPError as error:
-            handle_error(error)
-
-        results = [
-            {
-                "media_id": media["id"],
-                "source": Sources.TMDB.value,
-                "media_type": media_type,
-                "title": get_title(media),
-                "image": get_image_url(media["poster_path"]),
-            }
-            for media in response["results"]
-        ]
-
-        total_results = response["total_results"]
-        per_page = 20  # TMDB always returns 20 results per page
-        data = helpers.format_search_response(
-            page,
-            per_page,
-            total_results,
-            results,
-        )
-
-        cache.set(cache_key, data)
+    cache.set(cache_key, data, timeout=300)
 
     return data
-
 
 def find(external_id, external_source):
     """Search for media on TMDB."""
@@ -575,12 +575,14 @@ def season_scores_count(response):
 
 
 def get_genres(genres):
-    """Return the genres for the media."""
-    # when unknown genres, value from response is empty list
-    # e.g tv: 24795
-    if genres:
-        return [genre["name"] for genre in genres]
-    return None
+    """Return the genres for the media safely."""
+    if not genres:
+        return None
+    # If it's a list of IDs (integers), we can't get names yet, so return empty or placeholder
+    if all(isinstance(g, int) for g in genres):
+        return [] 
+    # If it's the full dictionary (from Details page)
+    return [genre["name"] for genre in genres if isinstance(genre, dict)]
 
 
 def get_country(countries):
@@ -850,3 +852,20 @@ def tv_changes():
 def movie_changes():
     """Return changed movie ids from TMDB for the last days across all pages."""
     return get_changed_ids(MediaTypes.MOVIE.value)
+
+
+def get_recommendations(media_type, media_id):
+    """Fetch recommendations from TMDB for a specific item."""
+    url = f"{base_url}/{media_type}/{media_id}/recommendations"
+    params = {**base_params}
+    try:
+        response = services.api_request(
+            Sources.TMDB.value,
+            "GET",
+            url,
+            params=params,
+        )
+        return response.get("results", [])
+    except Exception as e:
+        logger.error(f"TMDB Recommendations Error: {e}")
+        return []

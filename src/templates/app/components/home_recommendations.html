@@ -1,0 +1,55 @@
+{% load app_tags %}
+{% if recommendations %}
+<section id="ai-recommendations" class="mb-12 p-6 bg-[#1a1e23] rounded-xl border border-indigo-500/20 shadow-2xl relative">
+    <!-- Refresh Overlay Spinner -->
+    <div id="ai-refresh-indicator" class="htmx-indicator absolute inset-0 bg-[#1a1e23]/90 backdrop-blur-sm z-50 rounded-xl flex items-center justify-center" style="display:none;">
+        <div class="flex flex-col items-center">
+            <div class="animate-spin rounded-full h-14 w-14 border-4 border-indigo-500/30 border-t-indigo-500 mb-4"></div>
+            <p class="text-indigo-200 text-lg font-medium animate-pulse">Regenerating your picks...</p>
+        </div>
+    </div>
+    <style>
+        .htmx-request#ai-refresh-indicator,
+        .htmx-request #ai-refresh-indicator {
+            display: flex !important;
+        }
+    </style>
+
+    <div class="flex items-center justify-between mb-6 gap-4 flex-wrap">
+        <div class="flex flex-col">
+            <div class="flex items-center gap-3">
+                <span class="text-3xl drop-shadow-md">✨</span>
+                <h2 class="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-purple-500 tracking-tight drop-shadow-sm">Discover Your Next Favorite</h2>
+            </div>
+            <p class="text-indigo-200/70 mt-1 text-sm sm:text-base font-medium sm:ml-[3.25rem] ml-11">Handpicked gems tailored exclusively to your unique taste and history.</p>
+        </div>
+        
+        <button hx-get="{% url 'home' %}?load_recommendations=true&refresh=true" 
+                hx-target="#ai-recommendations" 
+                hx-swap="outerHTML" 
+                hx-indicator="#ai-refresh-indicator"
+                class="flex items-center gap-2 px-3 py-1.5 bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-300 hover:text-indigo-200 rounded-lg transition-all duration-200 text-sm font-semibold border border-indigo-500/30 cursor-pointer"
+                title="Generate new recommendations">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            Refresh
+        </button>
+    </div>
+    
+    {% if spotlight %}
+    <div class="mb-8 p-4 bg-indigo-600/10 border-l-4 border-indigo-500 rounded-r-lg flex gap-4 items-start shadow-inner">
+        <div class="bg-indigo-500 text-white px-2 py-1 rounded text-xs font-bold mt-1 shrink-0 uppercase tracking-wider">AI Pick</div>
+        <p class="text-indigo-100 text-sm sm:text-base leading-relaxed">"Our AI highly recommends checking out <strong class="text-white">{{ spotlight.0 }}</strong> based on your recent activity!"</p>
+    </div>
+    {% endif %}
+
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+        {% for rec in recommendations %}
+            {% include "app/components/media_card.html" with item=rec.item title=rec.title media=rec.media from_grid=True %}
+        {% endfor %}
+    </div>
+</section>
+{% else %}
+<div class="hidden"></div>
+{% endif %}

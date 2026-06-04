@@ -1,16 +1,27 @@
 services:
   yamtrack:
     container_name: yamtrack
-    image: ghcr.io/fuzzygrim/yamtrack
+    build: .
     restart: unless-stopped
     depends_on:
       - redis
     environment:
-      - TZ=Europe/Berlin
+      - TZ=Asia/Kolkata
       - SECRET=longstring
+      - ADMIN_ENABLED=True
       - REDIS_URL=redis://redis:6379
+      - TMDB_API=${TMDB_API_KEY}
+      - GOOGLE_BOOKS_API_KEY=${GOOGLE_BOOKS_API_KEY}
+      - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID}
+      - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GROQ_API_KEY=${GROQ_API_KEY}
+
     volumes:
       - ./db:/yamtrack/db
+      - ./src:/yamtrack
+      - ./src/staticfiles:/yamtrack/staticfiles
+
     ports:
       - "8000:8000"
 

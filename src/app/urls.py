@@ -82,4 +82,6 @@ urlpatterns = [
     ),
     path("statistics", views.statistics, name="statistics"),
     path("serviceworker.js", views.service_worker, name="service_worker"),
+    path("media_links/<str:category>/<str:item_id>", views.get_media_links, name="get_media_links"),
+    path("chat/message/", views.chatbot_message, name="chatbot_message"),
 ]

@@ -5,18 +5,19 @@
 {% block title %}
   {{ media.title }}
   {% if media.media_type == MediaTypes.SEASON.value %}S{{ media.season_number }}{% endif %}
-  - Yamtrack
+  - 
 {% endblock title %}
 
 {% block content %}
   {# Top section #}
+  
   <div class="flex flex-col md:flex-row gap-8 md:gap-10 mb-12 md:mb-8">
     <div class="w-full md:w-1/4 max-w-[250px] mx-auto md:mx-0">
       <img alt="{{ media.title }}"
            class="w-full rounded-lg shadow-lg bg-[#2a2f35] object-cover"
            src="{{ media.image }}">
 
-      <div x-data="{ trackOpen: false }">
+     <div x-data="{ trackOpen: false }">
         <button class="mt-4 p-3 rounded-lg w-full flex items-center text-white transition duration-300 cursor-pointer {% if user_medias %}bg-indigo-600 hover:bg-indigo-700{% else %}bg-gray-600 hover:bg-gray-700{% endif %}"
                 hx-get="{% media_view_url 'track_modal' media %}"
                 hx-vals='{"return_url": "{{ request.get_full_path|urlencode }}", "instance_id": "{{ current_instance.id }}"}'
@@ -30,10 +31,23 @@
               Add to tracker
             {% endif %}
           </div>
-
           <div class="h-5 mx-2 border-l border-white/30"></div>
           {% include "app/icons/edit.svg" with classes="w-5 h-5 shrink-0" %}
         </button>
+
+        
+
+        <div class="mt-4">
+    {% if media.media_id and media.media_id != 'None' %}
+      <button hx-get="{% url 'get_media_links' category=media.media_type item_id=media.media_id %}?title={{ media.title|urlencode }}"
+          hx-target="#modal-container"
+          hx-trigger="click"
+          class="flex items-center justify-center w-full px-4 py-3 text-sm font-bold text-white bg-purple-600 rounded-lg hover:bg-purple-700 shadow-lg cursor-pointer">
+        	🍿 Watch Now
+      </button>
+    {% endif %}
+
+</div>
 
         {# Track Modal #}
         <div x-show="trackOpen"
@@ -630,6 +644,13 @@
                       <div class="{% if episode.history %}md:h-[calc(2*1.5rem)]{% else %}md:h-[calc(3*1.5rem)]{% endif %} md:overflow-y-auto px-4">
                         <p class="text-sm text-gray-300 leading-relaxed text-pretty">{{ episode.overview }}</p>
                       </div>
+                      <div class="flex justify-center mt-2 px-4">
+                        <button hx-get="{% url 'get_media_links' category='tv' item_id=media.media_id %}?title={{ episode.title|urlencode }}"
+                                hx-target="#modal-container"
+                                class="text-[10px] px-2 py-1 text-white bg-purple-600 rounded hover:bg-purple-700 transition-colors cursor-pointer">
+                          🍿 Watch Now
+                        </button>
+                      </div>
                     </div>
                     {% if episode.history %}
                       <p class="text-xs text-gray-400 mt-2 px-4">
@@ -651,4 +672,4 @@
       {% endif %}
     </div>
   </div>
-{% endblock content %}
+{% endblock  %}

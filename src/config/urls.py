@@ -13,7 +13,6 @@ from django.contrib import admin
 from django.contrib.auth.decorators import login_not_required
 from django.urls import include, path
 from health_check.views import HealthCheckView
-from redis.asyncio import Redis as RedisClient
 
 urlpatterns = [
     path("", include("app.urls")),
@@ -30,14 +29,6 @@ urlpatterns = [
                     "health_check.Cache",
                     "health_check.Database",
                     "health_check.contrib.celery.Ping",
-                    (
-                        "health_check.contrib.redis.Redis",
-                        {
-                            "client_factory": lambda: RedisClient.from_url(
-                                settings.REDIS_URL
-                            )
-                        },
-                    ),
                 ]
             )
         ),

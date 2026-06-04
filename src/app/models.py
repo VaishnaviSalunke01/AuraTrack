@@ -891,6 +891,7 @@ class Media(models.Model):
 class BasicMedia(Media):
     """Model for basic media types."""
 
+    tracker = FieldTracker()
     objects = MediaManager()
 
 

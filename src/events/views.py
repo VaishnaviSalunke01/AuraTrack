@@ -3,6 +3,7 @@ import logging
 from datetime import UTC, date, timedelta
 
 import icalendar
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_not_required
 from django.core.exceptions import ObjectDoesNotExist
@@ -127,7 +128,7 @@ def download_calendar(_, token: str):
 
     # Create iCalendar object
     cal = icalendar.Calendar()
-    cal.add("prodid", "-//Yamtrack//EN")
+    cal.add("prodid", f"-//{settings.BRAND_NAME}//EN")
     cal.add("version", "2.0")
 
     for release in releases:

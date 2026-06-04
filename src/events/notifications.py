@@ -3,6 +3,7 @@ from datetime import UTC
 
 import apprise
 from django.apps import apps
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.utils import timezone
@@ -47,7 +48,7 @@ def send_releases():
     result = send_notifications(
         events=events,
         users=users,
-        title="🔔 YamTrack: New Releases Available! 🔔",
+        title=f"🔔 {settings.BRAND_NAME}: New Releases Available! 🔔",
     )
 
     # Mark events as notified
@@ -102,7 +103,7 @@ def send_daily_digest():
     if not events.exists():
         return "No releases scheduled for today"
 
-    title = "📆 YamTrack: Today's Releases 📆"
+    title = f"📆 {settings.BRAND_NAME}: Today's Releases 📆"
 
     result = send_notifications(
         events=events,

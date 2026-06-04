@@ -261,10 +261,10 @@ def media_url(media):
     is_dict = isinstance(media, dict)
 
     # Get attributes using either dict access or object attribute
-    media_type = media["media_type"] if is_dict else media.media_type
-    source = media["source"] if is_dict else media.source
-    media_id = media["media_id"] if is_dict else media.media_id
-    title = media["title"] if is_dict else media.title
+    media_type = media.get("media_type") if is_dict else media.media_type
+    source = media.get("source", "tmdb") if is_dict else media.source
+    media_id = media.get("media_id") if is_dict else media.media_id
+    title = media.get("title") if is_dict else media.title
 
     if media_type in [MediaTypes.SEASON.value, MediaTypes.EPISODE.value]:
         season_number = media["season_number"] if is_dict else media.season_number
@@ -296,9 +296,9 @@ def media_view_url(view_name, media):
 
     # Build kwargs using either dict access or object attribute
     kwargs = {
-        "source": media["source"] if is_dict else media.source,
-        "media_type": media["media_type"] if is_dict else media.media_type,
-        "media_id": media["media_id"] if is_dict else media.media_id,
+        "source": media.get("source", "tmdb") if is_dict else media.source,
+        "media_type": media.get("media_type") if is_dict else media.media_type,
+        "media_id": media.get("media_id") if is_dict else media.media_id,
     }
 
     # Handle season/episode numbers if they exist
@@ -322,8 +322,8 @@ def component_id(component_type, media, instance_id=None):
     is_dict = isinstance(media, dict)
 
     # Get base attributes using either dict access or object attribute
-    media_type = media["media_type"] if is_dict else media.media_type
-    media_id = media["media_id"] if is_dict else media.media_id
+    media_type = media.get("media_type") if is_dict else media.media_type
+    media_id = media.get("media_id") if is_dict else media.media_id
 
     component_id = f"{component_type}-{media_type}-{media_id}"
 

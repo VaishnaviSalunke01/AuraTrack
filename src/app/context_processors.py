@@ -8,10 +8,11 @@ from app.models import MediaTypes, Sources, Status
 def export_vars(request):  # noqa: ARG001
     """Export variables to templates."""
     return {
-        "REGISTRATION": settings.REGISTRATION,
-        "REDIRECT_LOGIN_TO_SSO": settings.REDIRECT_LOGIN_TO_SSO,
-        "IMG_NONE": settings.IMG_NONE,
-        "TRACK_TIME": settings.TRACK_TIME,
+        "REGISTRATION": getattr(settings, "REGISTRATION", False),
+        "REDIRECT_LOGIN_TO_SSO": getattr(settings, "REDIRECT_LOGIN_TO_SSO", False),
+        "IMG_NONE": getattr(settings, "IMG_NONE", "/static/img/none.png"),
+        "TRACK_TIME": getattr(settings, "TRACK_TIME", 30),
+        "BRAND_NAME": getattr(settings, "BRAND_NAME", "Yamtrack"),
     }
 
 

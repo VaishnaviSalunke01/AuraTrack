@@ -13,7 +13,9 @@ from app.models import (
     Season,
     Sources,
     Status,
+    BasicMedia,
 )
+from lists.models import CustomList, CustomListItem
 from users.models import HomeSortChoices
 
 
@@ -68,6 +70,40 @@ class HomeViewTests(TestCase):
             user=self.user,
             status=Status.IN_PROGRESS.value,
             progress=10,
+        )
+
+        self.movie_item = Item.objects.create(
+            media_id="2",
+            source=Sources.TMDB.value,
+            media_type=MediaTypes.MOVIE.value,
+            title="Recommended Movie",
+            image="http://example.com/movie.jpg",
+        )
+        self.movie_media = BasicMedia.objects.create(
+            item=self.movie_item,
+            user=self.user,
+            status=Status.COMPLETED.value,
+        )
+
+        self.tv_item = Item.objects.create(
+            media_id="3",
+            source=Sources.TMDB.value,
+            media_type=MediaTypes.TV.value,
+            title="Recommended TV Show",
+            image="http://example.com/tv.jpg",
+        )
+        self.tv_media = BasicMedia.objects.create(
+            item=self.tv_item,
+            user=self.user,
+            status=Status.PLANNING.value,
+        )
+
+        self.other_movie_item = Item.objects.create(
+            media_id="4",
+            source=Sources.TMDB.value,
+            media_type=MediaTypes.MOVIE.value,
+            title="Another Recommended Movie",
+            image="http://example.com/another_movie.jpg",
         )
 
     def test_home_view(self):
@@ -164,3 +200,152 @@ class HomeViewTests(TestCase):
             response.context["media_list"]["total"],
             15,
         )  # 15 TV shows total
+
+    @patch("app.providers.services.get_smart_recommendations")
+    def test_home_view_displays_recommendations_for_authenticated_user(self, mock_get_smart_recommendations):
+        """Test that the home view displays recommendations for an authenticated user."""
+        mock_get_smart_recommendations.return_value = {
+            "recommendations": [
+                {
+                    'item': {
+                        'title': "Recommended Movie",
+                        'image': self.movie_item.image,
+                        'media_id': self.movie_item.media_id,
+                        'media_type': MediaTypes.MOVIE.value,
+                        'source': Sources.TMDB.value,
+                    },
+                    'title': "Recommended Movie",
+                },
+                {
+                    'item': {
+                        'title': "Recommended TV Show",
+                        'image': self.tv_item.image,
+                        'media_id': self.tv_item.media_id,
+                        'media_type': MediaTypes.TV.value,
+                        'source': Sources.TMDB.value,
+                    },
+                    'title': "Recommended TV Show",
+                },
+            ],
+            "spotlight": {},
+        }
+
+        response = self.client.get(reverse("home") + "?load_recommendations=true", headers={"hx-request": "true"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "AI Smart Recommendations")
+        self.assertEqual(len(response.context["recommendations"]), 2)
+        self.assertContains(response, "Recommended Movie")
+        self.assertContains(response, "Recommended TV Show")
+
+
+    @patch("app.providers.services.get_smart_recommendations")
+    def test_home_view_no_recommendations_for_authenticated_user(self, mock_get_smart_recommendations):
+        """Test that no recommendations are displayed if the service returns an empty list."""
+        mock_get_smart_recommendations.return_value = {
+            "recommendations": [],
+            "spotlight": {},
+        }
+
+        response = self.client.get(reverse("home") + "?load_recommendations=true", headers={"hx-request": "true"})
+
+        self.assertEqual(response.status_code, 200)
+        # Verify the context is indeed empty
+        self.assertEqual(len(response.context["recommendations"]), 0)
+        # Check if the header specifically is missing
+        self.assertNotContains(response, "AI Smart Recommendations")
+
+    def test_home_view_no_recommendations_for_anonymous_user(self):
+        """Test that no recommendations are displayed for an anonymous user."""
+        self.client.logout()
+        response = self.client.get(reverse("home"))
+
+        # The view should redirect unauthenticated users to the login page.
+        # Check for the expected redirect status code (302).
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.url.startswith(reverse("account_login")))
+
+    @patch("app.providers.services.get_smart_recommendations")
+    @patch("app.helpers.enrich_items_with_user_data")
+    def test_home_view_recommendation_enrichment_with_existing_media(self, mock_enrich, mock_get_smart_recommendations):
+        """Test that recommendations are enriched with existing user media data."""
+        mock_get_smart_recommendations.return_value = {
+            "recommendations": [
+                {
+                    'item': {
+                        'title': "Recommended Movie",
+                        'image': self.movie_item.image,
+                        'media_id': self.movie_item.media_id,
+                        'media_type': MediaTypes.MOVIE.value,
+                        'source': Sources.TMDB.value,
+                    },
+                    'title': "Recommended Movie",
+                },
+            ],
+            "spotlight": {},
+        }
+
+        # Mock enrich_items_with_user_data to return a processed list where 'media' is not None
+        mock_enrich.return_value = [
+            {
+                'item': mock_get_smart_recommendations.return_value["recommendations"][0]['item'],
+                'media': self.movie_media, # This is the key part - linking to an existing BasicMedia
+            },
+        ]
+
+        response = self.client.get(reverse("home") + "?load_recommendations=true", headers={"hx-request": "true"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "AI Smart Recommendations")
+        self.assertEqual(len(response.context["recommendations"]), 1)
+        self.assertIsNotNone(response.context["recommendations"][0]['media'])
+        self.assertEqual(response.context["recommendations"][0]['media'].id, self.movie_media.id)
+        mock_enrich.assert_called_once()
+
+    @patch("app.providers.services.get_smart_recommendations")
+    @patch("app.helpers.enrich_items_with_user_data")
+    def test_home_view_recommendation_enrichment_without_existing_media(self, mock_enrich, mock_get_smart_recommendations):
+        """Test that recommendations are handled when no existing user media data matches."""
+        mock_get_smart_recommendations.return_value = {
+            "recommendations": [
+                {
+                    'item': {
+                        'title': "Another Recommended Movie",
+                        'image': self.other_movie_item.image,
+                        'media_id': self.other_movie_item.media_id,
+                        'media_type': MediaTypes.MOVIE.value,
+                        'source': Sources.TMDB.value,
+                    },
+                    'title': "Another Recommended Movie",
+                },
+            ],
+            "spotlight": {},
+        }
+
+        # Mock enrich_items_with_user_data to return a processed list where 'media' is None
+        mock_enrich.return_value = [
+            {
+                'item': mock_get_smart_recommendations.return_value["recommendations"][0]['item'],
+                'media': None, # No matching BasicMedia found
+            },
+        ]
+
+        response = self.client.get(reverse("home") + "?load_recommendations=true", headers={"hx-request": "true"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "AI Smart Recommendations")
+        self.assertEqual(len(response.context["recommendations"]), 1)
+        self.assertIsNone(response.context["recommendations"][0]['media'])
+        mock_enrich.assert_called_once()
+
+    @patch("app.providers.services.get_smart_recommendations")
+    def test_home_view_recommendation_error_handling(self, mock_get_smart_recommendations):
+        """Test that the home view handles errors gracefully when fetching recommendations."""
+        mock_get_smart_recommendations.side_effect = Exception("Gemini API error")
+
+        response = self.client.get(reverse("home") + "?load_recommendations=true", headers={"hx-request": "true"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "AI Smart Recommendations")
+        self.assertEqual(len(response.context["recommendations"]), 0)
+        mock_get_smart_recommendations.assert_called_once()

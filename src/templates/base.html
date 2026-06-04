@@ -7,18 +7,16 @@
     {# Required meta tags #}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="keywords" content="Yamtrack, Media Tracker">
-    <meta name="description" content="Search and track media on Yamtrack.">
+    <meta name="keywords" content="AuraTrack, Media Tracker">
+    <meta name="description" content="Search and track media on AuraTrack.">
 
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="mobile-web-app-title" content="Yamtrack">
+    <meta name="mobile-web-app-title" content="AuraTrack">
 
     <title>
-      {% block title %}
-        Yamtrack
-      {% endblock title %}
-    </title>
+  {% block title %}- AuraTrack{% endblock title %}
+</title>
 
     {% block extra_head %}
     {% endblock extra_head %}
@@ -27,8 +25,9 @@
           type="text/css"
           href="{% static 'css/main.css' %}{% get_static_file_mtime 'css/main.css' %}">
 
-    <script src="{% static 'js/libraries/htmx-2.0.4.min.js' %}"></script>
-    <script defer src="{% static 'js/libraries/alpinejs-3.14.9.min.js' %}"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
     <script src="{% static 'js/libraries/lazysizes-5.3.2.min.js' %}" async></script>
 
     <link rel="apple-touch-icon"
@@ -51,6 +50,12 @@
           content="{% static "favicon/browserconfig.xml" %}">
     <meta name="theme-color" content="#181a1b">
 
+    <style>
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    [x-cloak] { display: none !important; }
+</style>
+
   </head>
 
   <body>
@@ -68,13 +73,20 @@
         <aside class="fixed top-0 left-0 z-40 h-screen w-64 bg-[#1a1d20] transform transition-transform duration-300 ease-in-out border-r border-[#2c3136] -translate-x-full lg:translate-x-0 lg:sticky flex flex-col"
                :class="isMobileMenuOpen ? 'translate-x-0' : ''">
           <div class="h-16 border-b border-[#2c3136] flex items-center px-6">
-            <h1 class="text-2xl font-semibold text-gray-100">Yamtrack</h1>
-          </div>
+  <div class="flex items-center gap-2">
+    <div class="h-8 w-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+      A
+    </div>
+    <h1 class="text-xl font-extrabold tracking-tight text-gray-100">
+      Aura<span class="text-indigo-400">Track</span>
+    </h1>
+  </div>
+</div>
           <nav class="p-4 flex-1 overflow-y-auto">
             <ul class="space-y-1 mb-6">
               <li>
                 <a href="{% url 'home' %}"
-                   class="flex items-center space-x-3 px-4 py-2 rounded-md transition-colors duration-200 text-sm {% if request.path == "/" %}text-white bg-[#2c3136]{% else %}text-gray-400 hover:text-white hover:bg-[#23272b]{% endif %}">
+                   class="flex items-center space-x-3 px-4 py-2 rounded-md transition-colors duration-200 text-sm {% if request.path == '/' %}text-white bg-[#2c3136]{% else %}text-gray-400 hover:text-white hover:bg-[#23272b]{% endif %}">
                   {% if request.path|str_equals:"/" %}
                     {% include "app/icons/house.svg" with classes="w-5 h-5 text-indigo-400 " %}
 
@@ -213,14 +225,22 @@
                 {% if media_type == MediaTypes.SEASON.value %}
                   {% firstof MediaTypes.TV.value as search_type %}
                 {% else %}
-                  {% firstof media_type user.last_search_type as search_type %}
+          {% firstof media_type user.last_search_type 'movie' as search_type %}
                 {% endif %}
 
                 {# Search bar #}
+
                 <div class="relative w-full max-w-2xl">
+                  {% get_search_media_types user as search_types %}
+                  {{ search_types|json_script:"global-search-media-types" }}
                   <form method="get"
                         action="{% url 'search' %}"
-                        x-data=" { isOpen: false, selectedType: { display: '{{ search_type|media_type_readable_plural }}', value: '{{ search_type }}' }, mediaTypes: {% get_search_media_types user as search_types %}{{ search_types }}, getPlaceholder() { return `Search ${this.selectedType.display.toLowerCase()}...` } }">
+                        x-data="{
+                          isOpen: false,
+                          selectedType: { display: '{{ search_type|media_type_readable_plural|escapejs }}', value: '{{ search_type|escapejs }}' },
+                          mediaTypes: JSON.parse(document.getElementById('global-search-media-types').textContent),
+                          getPlaceholder() { return `Search ${this.selectedType.display.toLowerCase()}...` }
+                        }">
                     <div class="flex">
                       <div class="relative grow">
                         {# Search input #}
@@ -274,12 +294,13 @@
           <main class="flex-1 relative bg-[#212529]">
             <div class="container mx-auto px-8 py-12">
               {% block content %}
+                    {# This is where all your movie details and search results will appear #}
               {% endblock content %}
             </div>
           </main>
         </div>
       </div>
-    {% endblock body %}
+    
 
     {% if messages %}
       <div class="fixed top-24 right-0 left-0 {% block messages_sidebar_offset %}lg:left-64{% endblock messages_sidebar_offset %} z-50 flex justify-center pointer-events-none">
@@ -339,7 +360,15 @@
       }
     </script>
 
-    <script src="{% static 'js/mediaStatusDateHandler.js' %}{% get_static_file_mtime 'js/mediaStatusDateHandler.js' %}"></script>
+   <script src="{% static 'js/mediaStatusDateHandler.js' %}{% get_static_file_mtime 'js/mediaStatusDateHandler.js' %}"></script>
     <script src="{% static 'js/searchShortcut.js' %}{% get_static_file_mtime 'js/searchShortcut.js' %}"></script>
+
+
+<div id="modal-container" class="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none"></div>
+
+{% endblock body %}
+
+<!-- AI Chatbot Widget -->
+{% include "app/components/chatbot_widget.html" %}
   </body>
 </html>

@@ -1,6 +1,6 @@
 services:
-  yamtrack:
-    container_name: yamtrack
+  auratrack:
+    container_name: auratrack
     image: ghcr.io/fuzzygrim/yamtrack
     restart: unless-stopped
     depends_on:
@@ -20,7 +20,7 @@ services:
 
   db:
     image: postgres:16-alpine
-    container_name: yamtrack-db
+    container_name: auratrack-db
     environment:
       - POSTGRES_DB=yamtrack
       - POSTGRES_USER=yamtrack
@@ -30,7 +30,7 @@ services:
     restart: unless-stopped
 
   redis:
-    container_name: yamtrack-redis
+    container_name: auratrack-redis
     image: redis:8-alpine
     restart: unless-stopped
     volumes:

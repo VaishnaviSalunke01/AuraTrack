@@ -1,10 +1,10 @@
 {% load app_tags %}
 
-<div class="{% if secondary_color %}bg-[#39404b]{% else %}bg-[#2a2f35]{% endif %} rounded-lg overflow-hidden shadow-lg relative {% if active %}ring-[1.5px] ring-slate-400{% endif %}"
-     x-data="{ trackOpen: false, listsOpen: false, historyOpen: false }">
+<div class="{% if secondary_color %}bg-[#39404b]{% else %}bg-[#2a2f35]{% endif %} rounded-lg overflow-hidden shadow-lg relative {% if active %}ring-[1.5px] ring-slate-400{% endif %} w-full transition-transform duration-300 hover:scale-[1.02]"
+     x-data="{ trackOpen: false, listsOpen: false, historyOpen: false, watchOpen: false }">
   <div class="relative">
     <a href="{{ item|media_url }}">
-      <img alt="{{ title }}"
+      <img alt="{{ item.title }}"
            class="lazyload w-full {% if from_grid %}aspect-2/3{% else %}h-48{% endif %} bg-[#3e454d] {% if item.image != IMG_NONE %}object-cover{% endif %}"
            data-src="{{ item.image }}"
            src="{{ IMG_NONE }}">
@@ -87,7 +87,7 @@
           <button class="p-2.5 bg-indigo-600 text-white rounded-full hover:bg-indigo-500 hover:scale-110 hover:shadow-[0_0_15px_rgba(99,102,241,0.5)] transition-all duration-200 cursor-pointer"
                   title="Add to tracker"
                   hx-get="{% media_view_url 'track_modal' item %}"
-                  hx-vals='{"return_url": "{{ request.get_full_path|urlencode }}", "instance_id": "{{ media.id }}"}'
+                  hx-vals='{"return_url": "{{ request.path|urlencode }}", "instance_id": "{{ media.id }}"}'
                   hx-target="#{% component_id 'track' item media.id %}"
                   hx-trigger="click once"
                   @click="trackOpen = true">{% include "app/icons/edit.svg" with classes="w-4 h-4" %}</button>
@@ -97,7 +97,7 @@
         <button class="p-2.5 bg-emerald-600 text-white rounded-full hover:bg-emerald-500 hover:scale-110 hover:shadow-[0_0_15px_rgba(16,185,129,0.5)] transition-all duration-200 cursor-pointer"
                 title="Add to custom lists"
                 hx-get="{% media_view_url 'lists_modal' item %}"
-                hx-vals='{"return_url": "{{ request.get_full_path|urlencode }}"}'
+                hx-vals='{"return_url": "{{ request.path|urlencode }}"}'
                 hx-target="#{% component_id 'lists' item %}"
                 hx-trigger="click once"
                 @click="listsOpen = true">{% include "app/icons/list-add.svg" with classes="w-4 h-4" %}</button>
@@ -106,18 +106,29 @@
         <button class="p-2.5 bg-amber-600 text-white rounded-full hover:bg-amber-500 hover:scale-110 hover:shadow-[0_0_15px_rgba(245,158,11,0.5)] transition-all duration-200 cursor-pointer"
                 title="View your activity history"
                 hx-get="{% media_view_url 'history_modal' item %}"
-                hx-vals='{"return_url": "{{ request.get_full_path|urlencode }}"}'
+                hx-vals='{"return_url": "{{ request.path|urlencode }}"}'
                 hx-target="#{% component_id 'history' item %}"
                 hx-trigger="click once"
                 @click="historyOpen = true">{% include "app/icons/history.svg" with classes="w-4 h-4" %}</button>
+
+        {# Watch/Explore Button - The circle icon on hover #}
+        {% if item.media_id %}
+          <button class="p-2.5 bg-purple-600 text-white rounded-full hover:bg-purple-500 hover:scale-110 hover:shadow-[0_0_15px_rgba(147,51,234,0.5)] transition-all duration-200 cursor-pointer"
+                  title="Watch or explore this media"
+                  hx-get="{% url 'get_media_links' category=item.media_type item_id=item.media_id %}?title={{ item.title|urlencode }}"
+                  hx-target="#{% component_id 'watch' item %}"
+                  hx-trigger="click"
+                  @click="watchOpen = true">🍿</button>
+        {% endif %}
+
       </div>
     </div>
   </div>
 
   <div class="p-3">
     <a href="{{ item|media_url }}"
-       class="text-sm font-semibold text-white hover:text-indigo-400 transition duration-300 line-clamp-1"
-       title="{{ title }}">{{ title }}</a>
+       class="text-sm font-semibold text-white hover:text-indigo-400 transition duration-300 truncate"
+       title="{{ item.title }}">{{ item.title }}</a>
   </div>
 
   {% if item.media_type == MediaTypes.EPISODE.value %}
@@ -153,5 +164,24 @@
       <div id="{% component_id 'history' item %}"></div>
     </div>
   </div>
+
+  {# Watch Modal #}
+  <div x-show="watchOpen"
+       @keydown.escape.window="watchOpen = false"
+       class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div class="w-96 max-h-[90vh] px-4 md:px-0 relative z-60"
+         @click.outside="watchOpen = false">
+      <div id="{% component_id 'watch' item %}">
+        <!-- Loading spinner -->
+        <div class="bg-[#2a2f35] rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+          <div class="flex items-center justify-center">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+            <span class="ml-3 text-white">Loading...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   {% include "app/components/progress_bar.html" with media=media user=user only %}
+
 </div>
