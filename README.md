@@ -25,31 +25,8 @@ You can try the app at [auratrack.fuzzygrim.com](https://auratrack.fuzzygrim.com
 - 📥 Import from [Trakt](https://trakt.tv/), [Simkl](https://simkl.com/), [MyAnimeList](https://myanimelist.net/), [AniList](https://anilist.co/) and [Kitsu](https://kitsu.app/) with support for periodic automatic imports.
 - 📊 Export all your tracked media to a CSV file and import it back.
 
-## 📱 Screenshots
 
-| Homepage                                                                                        | Calendar                                                                                     |
-| ----------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| <img src="https://cdn.fuzzygrim.com/file/fuzzygrim/auratrack/homepage.png?v2" alt="Homepage" /> | <img src="https://cdn.fuzzygrim.com/file/fuzzygrim/auratrack/calendar.png" alt="calendar" /> |
-
-| Media List Grid                                                                                     | Media List Table                                                                                      |
-| --------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| <img src="https://cdn.fuzzygrim.com/file/fuzzygrim/auratrack/medialist_grid.png" alt="List Grid" /> | <img src="https://cdn.fuzzygrim.com/file/fuzzygrim/auratrack/medialist_table.png" alt="List Table" /> |
-
-| Media Details                                                                                          | Tracking                                                                                     |
-| ------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
-| <img src="https://cdn.fuzzygrim.com/file/fuzzygrim/auratrack/media_details.png" alt="Media Details" /> | <img src="https://cdn.fuzzygrim.com/file/fuzzygrim/auratrack/tracking.png" alt="Tracking" /> |
-
-| Season Details                                                                                           | Tracking Episodes                                                                                             |
 | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| <img src="https://cdn.fuzzygrim.com/file/fuzzygrim/auratrack/season_details.png" alt="Season Details" /> | <img src="https://cdn.fuzzygrim.com/file/fuzzygrim/auratrack/tracking_episode.png" alt="Tracking Episodes" /> |
-
-| Lists                                                                                  | Statistics                                                                                       |
-| -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| <img src="https://cdn.fuzzygrim.com/file/fuzzygrim/auratrack/lists.png" alt="Lists" /> | <img src="https://cdn.fuzzygrim.com/file/fuzzygrim/auratrack/statistics.png" alt="Statistics" /> |
-
-| Create Manual Entries                                                                                          | Import Data                                                                                        |
-| -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| <img src="https://cdn.fuzzygrim.com/file/fuzzygrim/auratrack/create_custom.png" alt="Create Manual Entries" /> | <img src="https://cdn.fuzzygrim.com/file/fuzzygrim/auratrack/import_data.png" alt="Import Data" /> |
 
 ## 🐳 Installing with Docker
 
