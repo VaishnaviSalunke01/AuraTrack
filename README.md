@@ -142,8 +142,3 @@ Have ideas for new features? Share them through [GitHub issues](https://github.c
 
 Pull requests are welcome! Whether it's fixing typos, improving documentation, or adding new features, your contributions help make AuraTrack better for everyone.
 
-### ☕ Donate
-
-If you'd like to support the project financially:
-
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/fuzzygrim)
