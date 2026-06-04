@@ -13,3 +13,42 @@ CLAUDE.md
 requests.http
 TODO.txt
 .codex
+
+# Ignore git metadata and local env files
+.git
+.gitignore
+.env
+.env.*
+
+# Python compiled files
+*.pyc
+__pycache__/
+
+# Virtualenvs
+venv/
+.venv/
+
+# SQLite DBs
+*.sqlite3
+*.sqlite3-shm
+*.sqlite3-wal
+
+# Node
+node_modules/
+
+# Build artifacts
+build/
+dist/
+
+# Editor files
+.vscode/
+.idea/
+
+# Logs and supervisor
+*.log
+src/supervisord.log
+src/supervisord.pid
+
+# Dockerfile/compose overrides (if you keep machine-specific files)
+docker-compose.override.yml
+
