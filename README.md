@@ -1,10 +1,6 @@
 # AuraTrack
 
-![App Tests](https://github.com/FuzzyGrim/AuraTrack/actions/workflows/app-tests.yml/badge.svg)
-![Docker Image](https://github.com/FuzzyGrim/AuraTrack/actions/workflows/docker-image.yml/badge.svg)
-![CodeFactor](https://www.codefactor.io/repository/github/fuzzygrim/auratrack/badge)
-![Codecov](https://codecov.io/github/FuzzyGrim/AuraTrack/branch/dev/graph/badge.svg?token=PWUG660120)
-![GitHub](https://img.shields.io/badge/license-AGPL--3.0-blue)
+
 
 AuraTrack is a self hosted media tracker for movies, tv shows, anime, manga, video games, books, comics, and board games.
 
