@@ -27,8 +27,16 @@ You can try the app at [auratrack.fuzzygrim.com](https://auratrack.fuzzygrim.com
 - 👥 Multi-users functionality allowing individual accounts with personalized tracking.
 - 🔑 Flexible authentication options including OIDC and 100+ social providers (Google, GitHub, Discord, etc.) via django-allauth.
 - 🦀 Integration with [Jellyfin](https://jellyfin.org/), [Plex](https://plex.tv/) and [Emby](https://emby.media/) to automatically track new media watched.
-- 📥 Import from [Trakt](https://trakt.tv/), [Simkl](https://simkl.com/), [MyAnimeList](https://myanimelist.net/), [AniList](https://anilist.co/) and [Kitsu](https://kitsu.app/) with support for periodic automatic imports.
+- 📥 Import from [Trakt](https://trakt.tv/), [Simkl](https://simkl.com/), [MyAnimeList](https://myanimelist.net/), [AniList](https://anilist.co/) and [Kitsu]   (https://kitsu.app/) with support for periodic automatic imports.
 - 📊 Export all your tracked media to a CSV file and import it back.
+  
+- 🤖 Personalized AI recommendations — Home and media listing pages surface tailored "AI Picks" generated from your recent activity, tracked statuses, and custom       lists, hydrated with real metadata via Auratrack's provider APIs.
+- 🔄 Refreshable spotlight picks — Regenerate recommendations on the fly (powered by HTMX) and get a highlighted "AI Pick" spotlight item when one stands out.
+- 💬 In-app AI chat assistant — An intelligent chatbot answers both general questions and app-specific queries using Groq (cloud) or Ollama (local), depending on        your configuration.
+- 📚 Library-aware chat — Ask about your watchlist, completed titles, progress, or custom lists and get answers drawn directly from your Yamtrack library data.
+- 🔍 Fact-grounded media Q&A — For questions about cast, plot, or release details, the assistant searches the database before responding — no hallucinated facts,        only verified information.
+
+
 
 
 | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
