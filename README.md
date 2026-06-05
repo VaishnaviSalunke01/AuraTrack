@@ -4,6 +4,11 @@
 
 AuraTrack is a self hosted media tracker for movies, tv shows, anime, manga, video games, books, comics, and board games.
 
+
+![App Tests](https://github.com/VaishnaviSalunke01/AuraTrack/actions/workflows/app-tests.yml/badge.svg)
+![Docker Image](https://github.com/VaishnaviSalunke01/AuraTrack/actions/workflows/docker-image.yml/badge.svg)
+![License](https://img.shields.io/badge/license-AGPL--3.0-blue)
+
 ## 🚀 Demo
 
 You can try the app at [auratrack.fuzzygrim.com](https://auratrack.fuzzygrim.com) using the username `demo` and password `demo`.
@@ -101,21 +106,10 @@ Go to: http://localhost:8000
 
 ## 💪 Support the Project
 
-There are many ways you can support AuraTrack's development:
+There are many ways to make AuraTrack better:
 
-### ⭐ Star the Project
-
-The simplest way to show your support is to star the repository on GitHub. It helps increase visibility and shows appreciation for the work.
-
-### 🐛 Bug Reports
-
-Found a bug? Open an [issue](https://github.com/FuzzyGrim/Yamtrack/issues) on GitHub with detailed steps to reproduce it. Quality bug reports are incredibly valuable for improving stability.
-
-### 💡 Feature Suggestions
-
-Have ideas for new features? Share them through [GitHub issues](https://github.com/FuzzyGrim/AuraTrack/issues). Your feedback helps shape the future of AuraTrack.
-
-### 🧪 Contributing
-
-Pull requests are welcome! Whether it's fixing typos, improving documentation, or adding new features, your contributions help make AuraTrack better for everyone.
+- ⭐ Star the repository on GitHub to increase visibility.
+- 🐛 Report bugs by opening an [issue](https://github.com/VaishnaviSalunke01/AuraTrack/issues).
+- 💡 Suggest new features through [GitHub issues](https://github.com/VaishnaviSalunke01/AuraTrack/issues).
+- 🧪 Send pull requests for documentation, bug fixes, or new features.
 
