@@ -41,6 +41,19 @@ You can try the app at [auratrack.fuzzygrim.com](https://auratrack.fuzzygrim.com
 
 | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
 
+
+Screenshots:
+
+<img width="1700" height="900" alt="image" src="https://github.com/user-attachments/assets/4c0c7aec-40db-42da-b9c6-25a340cbc0d9" />
+<img width="1918" height="913" alt="image" src="https://github.com/user-attachments/assets/073ddb09-6d54-417d-bb96-001621956dc0" />
+<img width="1919" height="908" alt="image" src="https://github.com/user-attachments/assets/1c8d1c44-22bd-405a-9296-853706ae90cc" />
+<img width="1913" height="909" alt="image" src="https://github.com/user-attachments/assets/30e76cbc-7f86-471e-b3bd-d2a73db03c4e" />
+<img width="1915" height="907" alt="image" src="https://github.com/user-attachments/assets/dfb62d67-68a9-4a32-83b2-8973dc89e00f" />
+
+
+
+
+
 ## 🐳 Installing with Docker
 
 Copy the default `docker-compose.yml` file from the repository and set the environment variables. This would use a SQlite database, which is enough for most use cases.
